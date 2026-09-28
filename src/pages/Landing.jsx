@@ -1145,53 +1145,6 @@ function FAQSection() {
   );
 }
 
-function FinalCTA() {
-  return (
-    <section className="relative overflow-hidden py-16 sm:py-28 lg:py-32">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(720px_circle_at_50%_35%,rgba(6,182,212,0.22),transparent_66%)] blur-2xl" />
-
-      <div className="relative mx-auto max-w-[1180px] px-5 sm:px-6 lg:px-8">
-        <Reveal>
-          <div className={`${CARD} relative overflow-hidden border-cyan-500/30 p-6 text-center sm:p-12 lg:p-16`}>
-            <span className="pointer-events-none absolute inset-x-12 top-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
-            <h2 className="mx-auto max-w-2xl text-[1.75rem] font-bold leading-[1.15] tracking-[-0.03em] text-white sm:text-[2.4rem] lg:text-[2.6rem]">
-              Take control of your money today.
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-[14px] leading-[1.7] text-slate-400 sm:mt-5 sm:text-[15px]">
-              The complete automated system designed to capture savings and grow your
-              budget.
-            </p>
-            <div className="mt-8 flex flex-col justify-center gap-3 sm:mt-10 sm:flex-row sm:gap-5">
-              <CtaLink
-                to="/register"
-                variant="primary"
-                className="w-full px-8 py-4 text-[15px] sm:w-auto"
-              >
-                Get Started
-              </CtaLink>
-              <CtaLink
-                to="/login"
-                variant="secondary"
-                className="w-full px-7 py-4 text-[15px] sm:w-auto"
-              >
-                User Login
-              </CtaLink>
-              <CtaLink
-                to="/admin/login"
-                variant="ghost"
-                className="w-full px-7 py-4 text-[15px] sm:w-auto"
-              >
-                <ShieldAlert size={16} className="text-cyan-400" />
-                Admin Login
-              </CtaLink>
-            </div>
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-}
-
 function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -1396,10 +1349,9 @@ export default function Landing() {
           <HowItWorks />
           <InsightsSection />
           <FAQSection />
-          <FinalCTA />
         </main>
         <Footer />
       </div>
     </div>
   );
-}
+}
