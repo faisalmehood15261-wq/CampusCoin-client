@@ -90,26 +90,16 @@ const CARD_BASE =
   'relative isolate z-10 rounded-2xl border shadow-xl shadow-black/40 transition-all duration-300 ease-out';
 
 const CARD_TONES = {
-  default:
-    'border-slate-800 bg-slate-900 hover:border-slate-700',
-  cyan:
-    'border-cyan-500/30 bg-[#081b2e] hover:border-cyan-500/50',
-  blue:
-    'border-blue-500/30 bg-[#081630] hover:border-blue-500/50',
-  emerald:
-    'border-emerald-500/30 bg-[#041d1a] hover:border-emerald-500/50',
-  amber:
-    'border-amber-500/30 bg-[#1f1507] hover:border-amber-500/50',
-  rose:
-    'border-rose-500/30 bg-[#1f0a12] hover:border-rose-500/50',
-  violet:
-    'border-violet-500/30 bg-[#180c28] hover:border-violet-500/50',
-  indigo:
-    'border-indigo-500/30 bg-[#0c1228] hover:border-indigo-500/50',
-  fuchsia:
-    'border-fuchsia-500/30 bg-[#1e0c25] hover:border-fuchsia-500/50',
-  teal:
-    'border-teal-500/30 bg-[#061e20] hover:border-teal-500/50',
+  default: 'border-slate-800 bg-slate-900 hover:border-slate-700',
+  cyan: 'border-cyan-500/30 bg-[#081b2e] hover:border-cyan-500/50',
+  blue: 'border-blue-500/30 bg-[#081630] hover:border-blue-500/50',
+  emerald: 'border-emerald-500/30 bg-[#041d1a] hover:border-emerald-500/50',
+  amber: 'border-amber-500/30 bg-[#1f1507] hover:border-amber-500/50',
+  rose: 'border-rose-500/30 bg-[#1f0a12] hover:border-rose-500/50',
+  violet: 'border-violet-500/30 bg-[#180c28] hover:border-violet-500/50',
+  indigo: 'border-indigo-500/30 bg-[#0c1228] hover:border-indigo-500/50',
+  fuchsia: 'border-fuchsia-500/30 bg-[#1e0c25] hover:border-fuchsia-500/50',
+  teal: 'border-teal-500/30 bg-[#061e20] hover:border-teal-500/50',
 };
 
 const CARD_PAD = 'p-5 sm:p-6';
@@ -145,10 +135,11 @@ function Card({
   as: Tag = 'article',
   tone = 'default',
   glow = false,
+  ...rest
 }) {
   const toneCls = CARD_TONES[tone] || CARD_TONES.default;
   return (
-    <Tag className={`${CARD_BASE} ${toneCls} ${padded ? CARD_PAD : ''} ${className}`}>
+    <Tag className={`${CARD_BASE} ${toneCls} ${padded ? CARD_PAD : ''} ${className}`} {...rest}>
       {glow ? (
         <div className="pointer-events-none absolute inset-0 -z-0 overflow-hidden rounded-2xl">
           <div className="absolute -right-16 -top-16 h-40 w-40 rounded-full bg-white/[0.05] blur-3xl" />
@@ -298,14 +289,16 @@ function Metric({ label, value, detail, tone = 'cyan', icon, trend }) {
       <div
         className={`pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-gradient-to-br ${t.accent} opacity-20 blur-3xl transition-opacity duration-500 group-hover:opacity-40`}
       />
-      <div
-        className={`pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r ${t.accent} opacity-70`}
-      />
       <div className="relative flex items-start justify-between gap-2">
-        <div
-          className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border ${t.chip} transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}
-        >
-          {icon}
+        <div className="flex flex-col items-start gap-2.5">
+          <div
+            className={`flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl border ${t.chip} transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3`}
+          >
+            {icon}
+          </div>
+          <div
+            className={`h-[3px] w-12 rounded-full bg-gradient-to-r ${t.accent} opacity-90`}
+          />
         </div>
         {trend ? (
           <span
@@ -597,136 +590,219 @@ function BudgetBar({ name, spent, limit, warningPercentage, colorIndex = 0, onRe
   );
 }
 
+function SectionHeader({ tone, icon, title, subtitle, count, countLabel }) {
+  const toneMap = {
+    amber: {
+      iconBox: 'border-amber-400/40 bg-amber-500/20 text-amber-100 shadow-amber-500/20',
+      badge: 'border-amber-400/50 bg-amber-500/20 text-amber-100',
+    },
+    cyan: {
+      iconBox: 'border-cyan-400/40 bg-cyan-500/20 text-cyan-100 shadow-cyan-500/20',
+      badge: 'border-cyan-400/50 bg-cyan-500/20 text-cyan-100',
+    },
+  };
+  const t = toneMap[tone] || toneMap.cyan;
+
+  return (
+    <div className="mb-4 flex flex-wrap items-center gap-3">
+      <span
+        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-lg ${t.iconBox}`}
+      >
+        {icon}
+      </span>
+      <div className="min-w-0 flex-1">
+        <h2 className="text-[15px] font-bold tracking-tight text-white sm:text-[16.5px]">
+          {title}
+        </h2>
+        {subtitle ? (
+          <p className="text-[11.5px] text-slate-400 sm:text-[12px]">{subtitle}</p>
+        ) : null}
+      </div>
+      {typeof count === 'number' ? (
+        <span
+          className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[11px] font-bold ${t.badge}`}
+        >
+          {count} {countLabel}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+function QuickAccessCard({ href, tone, icon, title, subtitle, badge, badgeTone }) {
+  const toneMap = {
+    violet: {
+      card: 'violet',
+      iconBox: 'border-violet-400/40 bg-violet-500/20 text-violet-100 shadow-violet-500/20',
+      accent: 'from-violet-400 to-purple-500',
+    },
+    cyan: {
+      card: 'cyan',
+      iconBox: 'border-cyan-400/40 bg-cyan-500/20 text-cyan-100 shadow-cyan-500/20',
+      accent: 'from-cyan-400 to-blue-500',
+    },
+    rose: {
+      card: 'rose',
+      iconBox: 'border-rose-400/40 bg-rose-500/20 text-rose-100 shadow-rose-500/20',
+      accent: 'from-rose-400 to-pink-500',
+    },
+  };
+  const t = toneMap[tone] || toneMap.cyan;
+
+  const badgeToneMap = {
+    violet: 'border-violet-400/50 bg-violet-500/20 text-violet-100',
+    rose: 'border-rose-400/50 bg-rose-500/20 text-rose-100',
+    cyan: 'border-cyan-400/50 bg-cyan-500/20 text-cyan-100',
+  };
+
+  return (
+    <a href={href} className="block">
+      <Card
+        tone={t.card}
+        padded={false}
+        className="group flex h-full cursor-pointer flex-col overflow-hidden p-5 hover:-translate-y-1 hover:shadow-2xl"
+      >
+        <div
+          className={`pointer-events-none absolute -right-14 -top-14 h-36 w-36 rounded-full bg-gradient-to-br ${t.accent} opacity-20 blur-3xl transition-opacity duration-500 group-hover:opacity-40`}
+        />
+        <div className="relative flex items-start justify-between gap-3">
+          <div className="flex flex-col items-start gap-2.5">
+            <span
+              className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-lg transition-transform duration-500 group-hover:scale-110 group-hover:rotate-3 ${t.iconBox}`}
+            >
+              {icon}
+            </span>
+            <div className={`h-[3px] w-12 rounded-full bg-gradient-to-r ${t.accent} opacity-90`} />
+          </div>
+          {badge ? (
+            <span
+              className={`shrink-0 rounded-full border px-3 py-1 text-[10.5px] font-bold uppercase tracking-wider ${
+                badgeToneMap[badgeTone] || badgeToneMap.cyan
+              }`}
+            >
+              {badge}
+            </span>
+          ) : null}
+        </div>
+        <p className="relative mt-3.5 text-[14px] font-bold tracking-tight text-white">{title}</p>
+        {subtitle ? (
+          <p className="relative mt-1.5 flex-1 text-[12px] leading-relaxed text-white/70">
+            {subtitle}
+          </p>
+        ) : null}
+        <div className="relative mt-4 flex items-center gap-1.5 text-[10.5px] font-bold uppercase tracking-[0.18em] text-white/60 transition-colors group-hover:text-white">
+          Open
+          <span className="transition-transform duration-300 group-hover:translate-x-0.5">→</span>
+        </div>
+      </Card>
+    </a>
+  );
+}
+
 function AnnouncementList({ items }) {
   if (!items.length) return null;
-  const visible = items.slice(0, 3);
+  const visible = items.slice(0, 6);
+
   return (
-    <Card tone="amber" padded={false} className="overflow-hidden hover:-translate-y-1">
-      <div className="flex items-center gap-3 border-b border-amber-400/15 bg-amber-500/[0.08] px-5 py-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-amber-400/40 bg-amber-500/20 text-amber-100 shadow-lg shadow-amber-500/20">
-          <Megaphone size={14} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-bold text-white">Announcements</p>
-          <p className="text-[10.5px] text-white/60">
-            {items.length} active {items.length === 1 ? 'notice' : 'notices'}
-          </p>
-        </div>
-      </div>
-      <ul className="divide-y divide-amber-400/10">
+    <section>
+      <SectionHeader
+        tone="amber"
+        icon={<Megaphone size={18} />}
+        title="Announcements"
+        subtitle="Official notices published by your campus admin"
+        count={items.length}
+        countLabel={items.length === 1 ? 'notice' : 'notices'}
+      />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map(a => (
-          <li
+          <Card
             key={a._id}
-            className="flex items-start gap-2.5 px-5 py-2.5 transition-colors hover:bg-white/[0.03]"
+            tone="amber"
+            className="group flex flex-col overflow-hidden hover:-translate-y-1"
           >
-            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-br from-amber-300 to-orange-500 shadow shadow-amber-400/60" />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[12.5px] font-semibold text-white">
-                {a.title || 'Untitled announcement'}
-              </p>
-              {a.message || a.body ? (
-                <p className="mt-0.5 line-clamp-1 text-[11px] leading-relaxed text-white/60">
-                  {a.message || a.body}
+            <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-amber-500/20 blur-3xl transition-opacity duration-500 group-hover:bg-amber-500/30" />
+            <div className="relative flex items-start gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-amber-400/40 bg-amber-500/20 text-amber-100 shadow-lg shadow-amber-500/20">
+                <Megaphone size={15} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[13.5px] font-bold leading-snug text-white">
+                  {a.title || 'Untitled announcement'}
                 </p>
-              ) : null}
+                {a.createdAt ? (
+                  <p className="mt-1 text-[10.5px] font-semibold uppercase tracking-wider text-amber-200/80">
+                    {dateLabel(a.createdAt)}
+                  </p>
+                ) : null}
+              </div>
             </div>
-          </li>
+            {a.message || a.body ? (
+              <p className="relative mt-3 whitespace-pre-wrap text-[12.5px] leading-relaxed text-white/80">
+                {a.message || a.body}
+              </p>
+            ) : null}
+          </Card>
         ))}
-      </ul>
-      {items.length > 3 ? (
-        <div className="border-t border-amber-400/10 px-5 py-2 text-center">
-          <p className="text-[10.5px] font-semibold text-amber-200/80">+{items.length - 3} more</p>
-        </div>
+      </div>
+      {items.length > visible.length ? (
+        <p className="mt-3 text-center text-[11.5px] font-semibold text-amber-200/80">
+          +{items.length - visible.length} more{' '}
+          {items.length - visible.length === 1 ? 'announcement' : 'announcements'}
+        </p>
       ) : null}
-    </Card>
+    </section>
   );
 }
 
 function TipsList({ tips }) {
   if (!tips.length) return null;
-  const visible = tips.slice(0, 3);
+  const visible = tips.slice(0, 6);
+
   return (
-    <Card tone="cyan" padded={false} className="overflow-hidden hover:-translate-y-1">
-      <div className="flex items-center gap-3 border-b border-cyan-400/15 bg-cyan-500/[0.08] px-5 py-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-cyan-400/40 bg-cyan-500/20 text-cyan-100 shadow-lg shadow-cyan-500/20">
-          <Sparkles size={14} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-bold text-white">Smart saving tips</p>
-          <p className="text-[10.5px] text-white/60">Personalized for you</p>
-        </div>
-      </div>
-      <ul className="divide-y divide-cyan-400/10">
+    <section>
+      <SectionHeader
+        tone="cyan"
+        icon={<Sparkles size={18} />}
+        title="Smart saving tips"
+        subtitle="Personalized suggestions and campus-wide advice"
+        count={tips.length}
+        countLabel={tips.length === 1 ? 'tip' : 'tips'}
+      />
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {visible.map(t => (
-          <li
+          <Card
             key={t._id}
-            className="flex items-start gap-2.5 px-5 py-2.5 transition-colors hover:bg-white/[0.03]"
+            tone="cyan"
+            className="group flex flex-col overflow-hidden hover:-translate-y-1"
           >
-            <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-gradient-to-br from-cyan-300 to-blue-500 shadow shadow-cyan-400/60" />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[12.5px] font-semibold text-white">{t.title}</p>
-              {t.description || t.content ? (
-                <p className="mt-0.5 line-clamp-1 text-[11px] leading-relaxed text-white/60">
-                  {t.description || t.content}
-                </p>
+            <div className="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-cyan-500/20 blur-3xl transition-opacity duration-500 group-hover:bg-cyan-500/30" />
+            <div className="relative flex items-start justify-between gap-3">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-cyan-400/40 bg-cyan-500/20 text-cyan-100 shadow-lg shadow-cyan-500/20">
+                <Lightbulb size={16} />
+              </span>
+              {t.potentialSaving ? (
+                <span className="shrink-0 rounded-full border border-emerald-400/50 bg-emerald-500/20 px-2.5 py-1 text-[10px] font-bold text-emerald-100 shadow-lg shadow-emerald-500/20">
+                  Save {money(t.potentialSaving)}
+                </span>
               ) : null}
             </div>
-            {t.potentialSaving ? (
-              <span className="shrink-0 rounded-full border border-emerald-400/50 bg-emerald-500/25 px-2 py-0.5 text-[9.5px] font-bold text-emerald-100 shadow-lg shadow-emerald-500/20">
-                {money(t.potentialSaving)}
-              </span>
-            ) : null}
-          </li>
-        ))}
-      </ul>
-      {tips.length > 3 ? (
-        <div className="border-t border-cyan-400/10 px-5 py-2 text-center">
-          <p className="text-[10.5px] font-semibold text-cyan-200/80">+{tips.length - 3} more</p>
-        </div>
-      ) : null}
-    </Card>
-  );
-}
-
-function AttentionList({ notifications }) {
-  if (!notifications.length) return null;
-  return (
-    <Card tone="rose" padded={false} className="overflow-hidden hover:-translate-y-1">
-      <div className="flex items-center gap-3 border-b border-rose-400/15 bg-rose-500/[0.08] px-5 py-3">
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-rose-400/40 bg-rose-500/20 text-rose-100 shadow-lg shadow-rose-500/20">
-          <Bell size={14} />
-        </div>
-        <div className="min-w-0 flex-1">
-          <p className="text-[13px] font-bold text-white">Attention needed</p>
-          <p className="text-[10.5px] text-white/60">
-            {notifications.length} live {notifications.length === 1 ? 'notice' : 'notices'}
-          </p>
-        </div>
-      </div>
-      <ul className="divide-y divide-rose-400/10">
-        {notifications.slice(0, 3).map(n => (
-          <li
-            key={n._id}
-            className="flex items-start gap-2.5 px-5 py-2.5 transition-colors hover:bg-white/[0.03]"
-          >
-            <CircleAlert size={13} className="mt-0.5 shrink-0 text-amber-300" />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[12.5px] font-semibold text-white">{n.title}</p>
-              <p className="mt-0.5 line-clamp-1 text-[11px] leading-relaxed text-white/60">
-                {n.message}
+            <p className="relative mt-3 text-[13.5px] font-bold leading-snug text-white">
+              {t.title}
+            </p>
+            {t.description || t.content ? (
+              <p className="relative mt-1.5 whitespace-pre-wrap text-[12.5px] leading-relaxed text-white/80">
+                {t.description || t.content}
               </p>
-            </div>
-          </li>
+            ) : null}
+          </Card>
         ))}
-      </ul>
-      {notifications.length > 3 ? (
-        <div className="border-t border-rose-400/10 px-5 py-2 text-center">
-          <p className="text-[10.5px] font-semibold text-rose-200/80">
-            +{notifications.length - 3} more
-          </p>
-        </div>
+      </div>
+      {tips.length > visible.length ? (
+        <p className="mt-3 text-center text-[11.5px] font-semibold text-cyan-200/80">
+          +{tips.length - visible.length} more {tips.length - visible.length === 1 ? 'tip' : 'tips'}
+        </p>
       ) : null}
-    </Card>
+    </section>
   );
 }
 
@@ -808,6 +884,8 @@ export function Dashboard() {
     }, {})
   );
 
+  const unreadCount = (notifications || []).filter(n => !n.isRead).length;
+
   return (
     <main
       ref={ref}
@@ -861,6 +939,36 @@ export function Dashboard() {
           value={money(forecast.nextMonthExpense)}
           detail={forecast.method}
           icon={<BarChart3 size={17} />}
+        />
+      </section>
+
+      <section className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
+        <QuickAccessCard
+          href="/insights"
+          tone="violet"
+          icon={<BrainCircuit size={18} />}
+          title="AI spending insight"
+          subtitle="Generate a smart analysis of your month"
+          badge="AI"
+          badgeTone="violet"
+        />
+        <QuickAccessCard
+          href="/assistant"
+          tone="cyan"
+          icon={<Sparkles size={18} />}
+          title="Ask the assistant"
+          subtitle="Chat about your spending and budgets"
+          badge="Chat"
+          badgeTone="cyan"
+        />
+        <QuickAccessCard
+          href="/notifications"
+          tone="rose"
+          icon={<Bell size={18} />}
+          title="Notifications"
+          subtitle="Budget alerts, reminders and updates"
+          badge={unreadCount ? `${unreadCount} new` : 'All read'}
+          badgeTone="rose"
         />
       </section>
 
@@ -946,25 +1054,9 @@ export function Dashboard() {
         </div>
       </section>
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <AnnouncementList items={announcements} />
-        <AttentionList notifications={notifications} />
-        <TipsList tips={tips} />
+      <AnnouncementList items={announcements} />
 
-        {!announcements.length && !notifications.length && !tips.length ? (
-          <div className="lg:col-span-3">
-            <Card tone="violet">
-              <CardHead title="Stay in the loop" subtitle="Announcements & saving tips" />
-              <Empty
-                compact
-                icon={<Megaphone size={18} className="text-white/60" />}
-                title="Nothing here yet"
-                description="Campus announcements and personalized tips will appear here."
-              />
-            </Card>
-          </div>
-        ) : null}
-      </section>
+      <TipsList tips={tips} />
     </main>
   );
 }
