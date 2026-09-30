@@ -272,22 +272,26 @@ function CoinScene({ reduce }) {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.3;
+    renderer.toneMappingExposure = 1.35;
     mount.appendChild(renderer.domElement);
 
-    scene.add(new THREE.AmbientLight(0x083344, 3));
+    scene.add(new THREE.AmbientLight(0x3d2408, 3));
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 3.5);
+    const keyLight = new THREE.DirectionalLight(0xfff5e0, 3.6);
     keyLight.position.set(5, 7, 8);
     scene.add(keyLight);
 
-    const cyanLight = new THREE.PointLight(0x06b6d4, 120, 40);
-    cyanLight.position.set(3, -2, 5);
-    scene.add(cyanLight);
+    const goldLight = new THREE.PointLight(0xf59e0b, 150, 40);
+    goldLight.position.set(3, -2, 5);
+    scene.add(goldLight);
 
-    const skyLight = new THREE.PointLight(0x0ea5e9, 90, 40);
-    skyLight.position.set(-4, 3, 5);
-    scene.add(skyLight);
+    const warmLight = new THREE.PointLight(0xfbbf24, 110, 40);
+    warmLight.position.set(-4, 3, 5);
+    scene.add(warmLight);
+
+    const rimLight = new THREE.PointLight(0xfde68a, 80, 40);
+    rimLight.position.set(0, 4, -6);
+    scene.add(rimLight);
 
     const root = new THREE.Group();
     scene.add(root);
@@ -307,31 +311,43 @@ function CoinScene({ reduce }) {
         size / 2,
         size / 2
       );
-      gradient.addColorStop(0, '#0e4a5c');
-      gradient.addColorStop(0.6, '#083344');
-      gradient.addColorStop(1, '#020810');
+      gradient.addColorStop(0, '#8a5410');
+      gradient.addColorStop(0.55, '#4f2f08');
+      gradient.addColorStop(1, '#1a0f02');
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, size, size);
 
-      ctx.strokeStyle = 'rgba(34, 211, 238, 0.95)';
+      ctx.strokeStyle = 'rgba(251, 191, 36, 0.95)';
       ctx.lineWidth = 10;
       ctx.beginPath();
       ctx.arc(size / 2, size / 2, size / 2 - 24, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.strokeStyle = 'rgba(14, 165, 233, 0.6)';
+      ctx.strokeStyle = 'rgba(245, 158, 11, 0.65)';
       ctx.lineWidth = 4;
       ctx.beginPath();
       ctx.arc(size / 2, size / 2, size / 2 - 48, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.shadowColor = 'rgba(6, 182, 212, 1)';
-      ctx.shadowBlur = 32;
+      ctx.strokeStyle = 'rgba(254, 240, 138, 0.35)';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(size / 2, size / 2, size / 2 - 66, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.shadowColor = 'rgba(251, 191, 36, 1)';
+      ctx.shadowBlur = 46;
       ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 230px "Inter", sans-serif';
+      ctx.font = 'bold 300px "Inter", "Segoe UI", sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText('CC', size / 2, size / 2 + 10);
+      ctx.fillText('$', size / 2, size / 2 + 18);
+
+      ctx.shadowBlur = 22;
+      ctx.shadowColor = 'rgba(253, 230, 138, 0.9)';
+      ctx.fillStyle = '#fffbeb';
+      ctx.font = 'bold 300px "Inter", "Segoe UI", sans-serif';
+      ctx.fillText('$', size / 2, size / 2 + 18);
       ctx.shadowBlur = 0;
 
       const texture = new THREE.CanvasTexture(canvas);
@@ -344,21 +360,21 @@ function CoinScene({ reduce }) {
 
     const faceMaterial = new THREE.MeshStandardMaterial({
       map: faceTexture,
-      roughness: 0.25,
-      metalness: 0.75,
-      emissive: 0x06b6d4,
-      emissiveIntensity: 0.25,
+      roughness: 0.22,
+      metalness: 0.9,
+      emissive: 0xf59e0b,
+      emissiveIntensity: 0.4,
       emissiveMap: faceTexture,
     });
 
     const sideMaterial = new THREE.MeshPhysicalMaterial({
-      color: 0x0e4a5c,
-      metalness: 0.95,
-      roughness: 0.15,
+      color: 0xa15a0d,
+      metalness: 0.98,
+      roughness: 0.12,
       clearcoat: 1,
-      clearcoatRoughness: 0.05,
-      emissive: 0x0e7490,
-      emissiveIntensity: 0.2,
+      clearcoatRoughness: 0.04,
+      emissive: 0xb45309,
+      emissiveIntensity: 0.3,
     });
 
     const coinGeometry = new THREE.CylinderGeometry(1.9, 1.9, 0.32, 96, 1, false);
@@ -366,7 +382,19 @@ function CoinScene({ reduce }) {
     coin.rotation.x = Math.PI / 2;
     root.add(coin);
 
-    const dustCount = 50;
+    const rimGeometry = new THREE.TorusGeometry(1.92, 0.035, 16, 128);
+    const rimMaterial = new THREE.MeshStandardMaterial({
+      color: 0xfde68a,
+      metalness: 1,
+      roughness: 0.15,
+      emissive: 0xfbbf24,
+      emissiveIntensity: 0.5,
+    });
+    const rim = new THREE.Mesh(rimGeometry, rimMaterial);
+    rim.rotation.x = Math.PI / 2;
+    root.add(rim);
+
+    const dustCount = 60;
     const dustPositions = new Float32Array(dustCount * 3);
     for (let i = 0; i < dustCount; i += 1) {
       dustPositions[i * 3] = (Math.random() - 0.5) * 9;
@@ -376,10 +404,10 @@ function CoinScene({ reduce }) {
     const dustGeometry = new THREE.BufferGeometry();
     dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
     const dustMaterial = new THREE.PointsMaterial({
-      color: 0x22d3ee,
-      size: 0.045,
+      color: 0xfbbf24,
+      size: 0.05,
       transparent: true,
-      opacity: 0.7,
+      opacity: 0.85,
       blending: THREE.AdditiveBlending,
     });
     const dust = new THREE.Points(dustGeometry, dustMaterial);
@@ -443,10 +471,10 @@ function CoinScene({ reduce }) {
   if (failed) {
     return (
       <div className="flex h-full w-full items-center justify-center">
-        <div className="relative flex h-48 w-48 items-center justify-center rounded-full bg-gradient-to-br from-cyan-600 via-sky-600 to-slate-900 p-1 shadow-[0_0_80px_rgba(6,182,212,0.5)] sm:h-64 sm:w-64">
-          <div className="flex h-full w-full items-center justify-center rounded-full bg-[#020810]">
-            <span className="text-4xl font-black tracking-tighter text-cyan-200 sm:text-6xl">
-              CC
+        <div className="relative flex h-48 w-48 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 via-amber-500 to-yellow-800 p-1 shadow-[0_0_80px_rgba(251,191,36,0.55)] sm:h-64 sm:w-64">
+          <div className="flex h-full w-full items-center justify-center rounded-full bg-[#1a0f02]">
+            <span className="text-5xl font-black tracking-tighter text-amber-300 drop-shadow-[0_0_20px_rgba(251,191,36,0.8)] sm:text-7xl">
+              $
             </span>
           </div>
         </div>
@@ -484,16 +512,16 @@ function Navbar() {
         }`}
       >
         <div className="flex items-center justify-between gap-4 px-4 py-2.5 sm:px-5 sm:py-3">
-        <Link
-  to="/"
-  className={`flex min-w-0 shrink items-center no-underline ${FOCUS_RING} rounded-lg`}
->
-  <img
-    src="/logo.png"
-    alt="Campus Coin"
-    className="block h-auto w-auto max-h-11 max-w-[180px] object-contain sm:max-h-12 sm:max-w-[215px] md:max-h-14 md:max-w-[250px] lg:max-h-16 lg:max-w-[285px]"
-  />
-</Link>
+          <Link
+            to="/"
+            className={`flex min-w-0 shrink items-center no-underline ${FOCUS_RING} rounded-lg`}
+          >
+            <img
+              src="/logo.png"
+              alt="Campus Coin"
+              className="block h-auto w-auto max-h-11 max-w-[180px] object-contain sm:max-h-12 sm:max-w-[215px] md:max-h-14 md:max-w-[250px] lg:max-h-16 lg:max-w-[285px]"
+            />
+          </Link>
 
           <nav className="hidden items-center gap-7 lg:flex">
             {NAV_LINKS.map(link => (
@@ -580,7 +608,7 @@ function Hero() {
       className="relative flex items-center justify-center overflow-hidden pt-28 pb-16 lg:pt-36 lg:pb-28"
     >
       <div className="pointer-events-none absolute inset-0 bg-[#050D14]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_circle_at_50%_20%,rgba(6,182,212,0.25),transparent_70%),radial-gradient(900px_circle_at_85%_75%,rgba(14,165,233,0.18),transparent_65%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(1200px_circle_at_50%_20%,rgba(6,182,212,0.22),transparent_70%),radial-gradient(900px_circle_at_85%_75%,rgba(251,191,36,0.16),transparent_65%)]" />
       <div className="pointer-events-none absolute inset-0 opacity-25 [background-image:linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] [background-size:36px_36px]" />
 
       <div className="relative z-10 mx-auto w-full max-w-[1240px] px-4 sm:px-6 lg:px-8">
@@ -1334,7 +1362,7 @@ export default function Landing() {
 
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
         <div className="absolute inset-0 bg-[#050D14]" />
-        <div className="absolute inset-0 bg-[radial-gradient(1000px_circle_at_50%_15%,rgba(6,182,212,0.22),transparent_60%),radial-gradient(800px_circle_at_80%_80%,rgba(14,165,233,0.12),transparent_65%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(1000px_circle_at_50%_15%,rgba(6,182,212,0.22),transparent_60%),radial-gradient(800px_circle_at_80%_80%,rgba(251,191,36,0.12),transparent_65%)]" />
         <div className="absolute inset-0 opacity-[0.25] [background-image:radial-gradient(rgba(255,255,255,0.15)_1px,transparent_1px)] [background-size:24px_24px]" />
       </div>
 
