@@ -4,6 +4,7 @@ const ThemeContext = createContext();
 
 export function ThemeProvider({ children }) {
   useEffect(() => {
+    document.documentElement.classList.add('dark');
     document.documentElement.setAttribute('data-theme', 'dark');
     document.documentElement.style.colorScheme = 'dark';
   }, []);

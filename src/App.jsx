@@ -1,4 +1,3 @@
-
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
