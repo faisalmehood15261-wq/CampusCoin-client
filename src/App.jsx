@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
@@ -8,11 +9,15 @@ import { Admin } from './pages/Admin.jsx';
 import Landing from './pages/Landing.jsx';
 import { Loader } from './components/common/Loader.jsx';
 
+function homeFor(role) {
+  return role === 'admin' ? '/admin' : '/dashboard';
+}
+
 function Guard({ children, admin = false, studentOnly = false }) {
   const { user, loading } = useAuth();
 
   if (loading) return <Loader/>;
-  if (!user) return <Navigate to="/" replace/>;
+  if (!user) return <Navigate to={admin ? '/admin/login' : '/login'} replace/>;
 
   if (admin && user.role !== 'admin') {
     return <Navigate to="/dashboard" replace/>;
@@ -25,14 +30,29 @@ function Guard({ children, admin = false, studentOnly = false }) {
   return children;
 }
 
-function Guest({ children }) {
-  const { user, loading } = useAuth();
+function Guest({ children, allowRole = 'student' }) {
+  const { user, loading, signOut } = useAuth();
+  const [switching, setSwitching] = useState(false);
 
-  if (loading) return <Loader/>;
+  useEffect(() => {
+    if (loading || !user || user.role === allowRole || switching) return undefined;
+    let active = true;
+    setSwitching(true);
+    signOut().finally(() => {
+      if (active) setSwitching(false);
+    });
+    return () => {
+      active = false;
+    };
+  }, [user, loading, allowRole, switching, signOut]);
 
-  return user
-    ? <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace/>
-    : children;
+  if (loading || switching) return <Loader/>;
+
+  if (user && user.role === allowRole) {
+    return <Navigate to={homeFor(user.role)} replace/>;
+  }
+
+  return children;
 }
 
 function AppRoutes() {
@@ -40,16 +60,16 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Landing/>}/>
 
-      <Route path="/login" element={<Guest><AuthPage mode="login"/></Guest>}/>
+      <Route path="/login" element={<Guest allowRole="student"><AuthPage mode="login"/></Guest>}/>
 
       <Route
         path="/admin/login"
-        element={<AuthPage mode="login" adminOnly/>}
+        element={<Guest allowRole="admin"><AuthPage mode="login" adminOnly/></Guest>}
       />
 
-      <Route path="/register" element={<Guest><AuthPage mode="register"/></Guest>}/>
-      <Route path="/forgot-password" element={<Guest><ForgotPassword/></Guest>}/>
-      <Route path="/reset-password/:token" element={<Guest><ResetPassword/></Guest>}/>
+      <Route path="/register" element={<Guest allowRole="student"><AuthPage mode="register"/></Guest>}/>
+      <Route path="/forgot-password" element={<Guest allowRole="student"><ForgotPassword/></Guest>}/>
+      <Route path="/reset-password/:token" element={<Guest allowRole="student"><ResetPassword/></Guest>}/>
 
       <Route element={<Guard><AppShell/></Guard>}>
         <Route path="/dashboard" element={<Guard studentOnly><Dashboard/></Guard>}/>

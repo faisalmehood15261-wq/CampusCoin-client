@@ -1061,13 +1061,21 @@ export function AuthPage({ mode, adminOnly = false }) {
       if (remember) localStorage.setItem(REMEMBER_KEY, form.email);
       else localStorage.removeItem(REMEMBER_KEY);
     }
+    if (adminOnly && data.user.role !== 'admin') {
+      notifyError('Administrator Login Failed', 'This account is not an administrator.');
+      return;
+    }
+    if (!adminOnly && data.user.role === 'admin') {
+      notifyError('Login Failed', 'Administrators must sign in through the admin portal.');
+      return;
+    }
     setUser(data.user);
     notifySuccess(
       msg ||
         (adminOnly ? 'Administrator access granted' : isLogin ? 'Welcome Back!' : 'Account Created!'),
       `Signed in as ${data.user.name || data.user.email}`
     );
-    nav(data.user.role === 'admin' ? '/admin' : '/dashboard', { replace: true });
+    nav(adminOnly ? '/admin' : '/dashboard', { replace: true });
   };
 
   const submit = async event => {
